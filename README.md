@@ -56,21 +56,21 @@ def do_care_trailing_slash(hdlr):
 The following expression may cause unexpected behavior:
 ```python
 @bhh.handle("GET", "/api/foo/bar")
-def dont_care_trailing_slash(hdlr):
+def no_trailing_slash(hdlr):
     # Do something
 
 @bhh.handle("GET", "/api/foo/bar/")
-def do_care_trailing_slash(hdlr):
+def with_trailing_slash(hdlr):
     # Do somthing else
 ```
 Instead, if the function need to differentiate the behavior with/without the trailing slash:
 ```python
 @bhh.handle("GET", "/api/foo/bar", optional_trail_slash=False)
-def dont_care_trailing_slash(hdlr):
+def no_trailing_slash(hdlr):
     # Do something
 
 @bhh.handle("GET", "/api/foo/bar/")
-def do_care_trailing_slash(hdlr):
+def with_trailing_slash(hdlr):
     # Do somthing else
 ```
 
