@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bhh-example
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-example
+  namespace: bhh-example
+data:
+  # Specify listening on which IP address, usually 0.0.0.0 since there's no need to specify IP for a pod in normal circumstances.
+  HOST: 0.0.0.0
+  # Specify the port to listen
+  PORT: 8080
+  
+---
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: bhh-deployment-example
+  namespce: bhh-example
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bhh-example
+  template:
+    metadata:
+      labels:
+        app: bhh-example
+    spec:
+      containers:
+      - name: bhh-instance
+        image: INSERT-IMAGE-SPEC-HERE
+        envFrom:
+        - configMapRef:
+            name: bhh-example
+        ports:
+        - containerPort: 8080
