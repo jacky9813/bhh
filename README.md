@@ -1,5 +1,7 @@
 # Better HTTP Handler (BHH)
 
+** This project is in early development. The API may change anytime. **
+
 This is a very basic HTTP Handler for Python built-in HTTP Server that opens up some easy way for web API development.
 
 There're several benefits for using bhh:
