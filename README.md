@@ -9,6 +9,10 @@ There're several benefits for using bhh:
 * The usage is very similar to built-in HTTP server handler.
 * Suitable for small projects.
 
+## System Requirements
+
+* Python 3 (Python 3.6+ recommended)
+
 ## Create Handler
 
 Very simple. Include the bhh and either use `bhh.register_handler` or `@bhh.handle`. Here're examples that does exact same thing:
