@@ -82,6 +82,8 @@ def with_trailing_slash(hdlr):
 
 ## Get data from request body
 
+The following example requires `Content-Length` in request headers. (Suggested)
+
 ```python
 import http
 import json
@@ -90,7 +92,8 @@ import bhh
 @bhh.handle("POST", "/api/foo/bar")
 def post_something(hdlr):
     try:
-        data = json.load(hdlr.rfile)
+        content_length = int(hdlr.headers["Content-Type"])
+        data = json.loads(hdlr.rfile.read(content_length))
     except:
         hdlr.send_response(http.HTTPStatus.BAD_REQUEST)
         hdlr.end_headers()
