@@ -92,7 +92,7 @@ import bhh
 @bhh.handle("POST", "/api/foo/bar")
 def post_something(hdlr):
     try:
-        content_length = int(hdlr.headers["Content-Type"])
+        content_length = int(hdlr.headers["Content-Length"])
         data = json.loads(hdlr.rfile.read(content_length))
     except:
         hdlr.send_response(http.HTTPStatus.BAD_REQUEST)
