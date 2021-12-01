@@ -113,16 +113,16 @@ class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             if hasattr(self, mname):
                 method = getattr(self, mname)
             # Search if there's a match for the URI
-            for k in EXTERNAL_HANDLERS:
-                match = EXTERNAL_HANDLERS[k]["regexp"].search(self.path)
+            for _, uri_obj in EXTERNAL_HANDLERS.items():
+                match = uri_obj["regexp"].search(self.path)
                 if match is not None:
-                    if self.command in EXTERNAL_HANDLERS[k]["handlers"]:
+                    if self.command in uri_obj["handlers"]:
                         variables = {}
                         match_groups = match.groups()
-                        for i in range(len(EXTERNAL_HANDLERS[k]["variables"])):
-                            variables[EXTERNAL_HANDLERS[k]["variables"][i]] = \
+                        for i in range(len(uri_obj["variables"])):
+                            variables[uri_obj["variables"][i]] = \
                                 urllib.parse.unquote(match_groups[i])
-                        EXTERNAL_HANDLERS[k]["handlers"][self.command](self, **variables)
+                        uri_obj["handlers"][self.command](self, **variables)
                         method = "external"
                     else:
                         self.send_error(
@@ -145,6 +145,9 @@ class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             return
 
     def do_GET(self):
+        """
+        Default GET handler for an URI.
+        """
         path = os.path.realpath(STATIC_PATH + self.path)
         if path[:len(STATIC_PATH)] != STATIC_PATH:
             # Real path is not inside static.
@@ -152,25 +155,24 @@ class HTTPRequestHandler(http.server.BaseHTTPRequestHandler):
             self.send_header("Content-Length", "0")
             self.end_headers()
         else:
-            fd = None
+            fdesc = None
             if os.path.isfile(path):
-                fd = open(path, mode="rb")
-                t = path
+                fdesc = open(path, mode="rb")
+                system_path = path
             elif os.path.isdir(path):
-                fd = None
                 for i in INDEX_PAGE:
-                    t = os.path.realpath(os.path.join(path,i))
-                    if os.path.isfile(t):
-                        fd = open(t, "rb")
+                    system_path = os.path.realpath(os.path.join(path,i))
+                    if os.path.isfile(system_path):
+                        fdesc = open(system_path, "rb")
                         break
-            if fd:
-                fs = os.fstat(fd.fileno())
-                mime = mimetypes.guess_type(t)
+            if fdesc:
+                file_stat = os.fstat(fdesc.fileno())
+                mime = mimetypes.guess_type(system_path)
                 self.send_response(HTTPStatus.OK)
                 self.send_header("Content-Type", mime[0])
-                self.send_header("Content-Length", str(fs.st_size))
+                self.send_header("Content-Length", str(file_stat.st_size))
                 self.end_headers()
-                shutil.copyfileobj(fd, self.wfile)
+                shutil.copyfileobj(fdesc, self.wfile)
             else:
                 self.send_response(HTTPStatus.NOT_FOUND)
                 self.send_header("Content-Length", "0")
